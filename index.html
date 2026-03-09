@@ -755,15 +755,19 @@ function handleAuth() {
     'https://www.googleapis.com/auth/drive.file'
   ].join(' ');
 
+  // Build clean redirect URI (no hash, no query params)
+  const redirectUri = window.location.origin + window.location.pathname;
+
   const params = new URLSearchParams({
     client_id: clientId,
-    redirect_uri: window.location.href.split('?')[0],
+    redirect_uri: redirectUri,
     response_type: 'token',
     scope: scopes,
-    include_granted_scopes: 'true'
+    include_granted_scopes: 'true',
+    prompt: 'consent'
   });
 
-  window.location.href = `https://accounts.google.com/o/oauth2/auth?${params}`;
+  window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
 }
 
 // Handle OAuth redirect
