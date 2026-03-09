@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>אוסף חשבוניות | Invoice Collector</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a28;
+    --border: #2a2a3e;
+    --accent: #6c63ff;
+    --accent2: #a78bfa;
+    --green: #34d399;
+    --red: #f87171;
+    --yellow: #fbbf24;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    direction: rtl;
+  }
+
+  .app {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 20px;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .header-text h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .header-text p {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* Setup Banner */
+  .setup-banner {
+    background: linear-gradient(135deg, #1e1b4b, #1a1a28);
+    border: 1px solid #3730a3;
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 28px;
+  }
+
+  .setup-banner h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--accent2);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .setup-steps {
+    list-style: none;
+    counter-reset: steps;
+  }
+
+  .setup-steps li {
+    counter-increment: steps;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+
+  .setup-steps li::before {
+    content: counter(steps);
+    background: var(--accent);
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .setup-steps a {
+    color: var(--accent2);
+    text-decoration: none;
+  }
+
+  .setup-steps code {
+    background: #0f0e2a;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 12px;
+    color: #a78bfa;
+  }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Form elements */
+  label {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  input, select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'Heebo', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    direction: ltr;
+    text-align: right;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--accent);
+  }
+
+  input[type="text"] { direction: ltr; text-align: left; }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  /* Keyword pills */
+  .keywords-section {
+    margin-bottom: 16px;
+  }
+
+  .pills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .pill.active {
+    background: #1e1b4b;
+    border-color: var(--accent);
+    color: var(--accent2);
+  }
+
+  .pill .lang-tag {
+    font-size: 10px;
+    background: rgba(108,99,255,0.2);
+    color: var(--accent2);
+    border-radius: 4px;
+    padding: 1px 4px;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 20px;
+    border-radius: 8px;
+    font-family: 'Heebo', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #4f46e5);
+    color: white;
+    width: 100%;
+    justify-content: center;
+    padding: 13px;
+    font-size: 15px;
+  }
+
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent2); }
+
+  .btn-google {
+    background: white;
+    color: #333;
+    border: 1px solid #ddd;
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
+    font-size: 15px;
+  }
+
+  .btn-google:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+
+  /* Auth status */
+  .auth-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+
+  .auth-status.connected {
+    background: rgba(52, 211, 153, 0.1);
+    border: 1px solid rgba(52, 211, 153, 0.3);
+    color: var(--green);
+  }
+
+  .auth-status.disconnected {
+    background: rgba(248, 113, 113, 0.1);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    color: var(--red);
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  .dot.pulse {
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* Progress */
+  .progress-section {
+    display: none;
+    margin-top: 20px;
+  }
+
+  .progress-section.visible { display: block; }
+
+  .progress-bar-outer {
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .progress-bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  .progress-text {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  /* Log */
+  .log-container {
+    background: #050508;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    max-height: 220px;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    direction: ltr;
+    text-align: left;
+    margin-top: 14px;
+  }
+
+  .log-line {
+    margin-bottom: 4px;
+    line-height: 1.5;
+  }
+
+  .log-line.info { color: #64748b; }
+  .log-line.success { color: var(--green); }
+  .log-line.warning { color: var(--yellow); }
+  .log-line.error { color: var(--red); }
+
+  /* Results */
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 16px;
+  }
+
+  .stat-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--accent2);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* Found emails list */
+  .email-list {
+    margin-top: 16px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .email-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .email-item .icon { font-size: 18px; flex-shrink: 0; }
+
+  .email-item .email-meta { flex: 1; min-width: 0; }
+  .email-item .email-subject {
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    direction: rtl;
+  }
+  .email-item .email-from { color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+  .email-item .badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .badge.saved { background: rgba(52,211,153,0.15); color: var(--green); }
+  .badge.pending { background: rgba(251,191,36,0.15); color: var(--yellow); }
+  .badge.failed { background: rgba(248,113,113,0.15); color: var(--red); }
+
+  /* Drive folder link */
+  .folder-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: rgba(52,211,153,0.08);
+    border: 1px solid rgba(52,211,153,0.25);
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--green);
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 16px;
+    transition: all 0.2s;
+  }
+
+  .folder-link:hover { background: rgba(52,211,153,0.14); }
+
+  /* Toggle */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .toggle-row:last-child { border-bottom: none; }
+
+  .toggle-label { font-size: 14px; color: var(--text); }
+  .toggle-sublabel { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .toggle {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+
+  .toggle input { opacity: 0; width: 0; height: 0; }
+
+  .slider {
+    position: absolute;
+    inset: 0;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .slider::before {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    right: 2px;
+    top: 2px;
+    background: var(--muted);
+    border-radius: 50%;
+    transition: 0.3s;
+  }
+
+  .toggle input:checked + .slider { background: var(--accent); border-color: var(--accent); }
+  .toggle input:checked + .slider::before { right: 22px; background: white; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+    .results-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">📂</div>
+    <div class="header-text">
+      <h1>אוסף חשבוניות</h1>
+      <p>Invoice Collector — Gmail → Google Drive</p>
+    </div>
+  </div>
+
+  <!-- Setup Instructions -->
+  <div class="setup-banner" id="setupBanner">
+    <h3>⚙️ הגדרה ראשונית נדרשת</h3>
+    <ol class="setup-steps">
+      <li>כנס ל-<a href="https://console.cloud.google.com" target="_blank">Google Cloud Console</a> וצור פרויקט חדש</li>
+      <li>אפשר את <strong>Gmail API</strong> ו-<strong>Google Drive API</strong> תחת "APIs & Services"</li>
+      <li>צור OAuth 2.0 Client ID מסוג <code>Web application</code>, הוסף את ה-URL של הדף הזה ל-Authorized origins</li>
+      <li>הכנס את ה-Client ID שקיבלת בשדה למטה והכלי מוכן לשימוש</li>
+    </ol>
+  </div>
+
+  <!-- Client ID Setup -->
+  <div class="card">
+    <div class="card-title">🔑 Google OAuth Client ID</div>
+    <div class="form-group">
+      <label>Client ID (מ-Google Cloud Console)</label>
+      <input type="text" id="clientIdInput" placeholder="123456789-abc...apps.googleusercontent.com" style="direction:ltr; text-align:left;" />
+    </div>
+    <div id="authStatus" class="auth-status disconnected">
+      <div class="dot"></div>
+      <span>לא מחובר — הכנס Client ID והתחבר</span>
+    </div>
+    <button class="btn btn-google" id="authBtn" onclick="handleAuth()">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#4285F4" d="M47.53 24.56c0-1.6-.13-3.13-.39-4.61H24.3v8.72h13.06c-.56 3.02-2.26 5.57-4.82 7.3v6.07h7.8c4.57-4.21 7.19-10.41 7.19-17.48z"/><path fill="#34A853" d="M24.3 48c6.55 0 12.04-2.17 16.04-5.87l-7.8-6.07c-2.17 1.45-4.94 2.3-8.24 2.3-6.34 0-11.7-4.28-13.62-10.03H2.62v6.26C6.6 42.59 14.87 48 24.3 48z"/><path fill="#FBBC04" d="M10.68 28.33A14.4 14.4 0 0 1 9.8 24c0-1.5.26-2.96.7-4.33v-6.26H2.62A23.93 23.93 0 0 0 .3 24c0 3.87.92 7.53 2.54 10.76l7.84-6.43z"/><path fill="#EA4335" d="M24.3 9.57c3.57 0 6.77 1.23 9.29 3.63l6.96-6.96C36.32 2.36 30.84 0 24.3 0 14.87 0 6.6 5.41 2.62 13.41l8.06 6.26C12.6 13.85 17.96 9.57 24.3 9.57z"/></svg>
+      התחבר עם Google
+    </button>
+  </div>
+
+  <!-- Search Settings -->
+  <div class="card">
+    <div class="card-title">🔍 הגדרות חיפוש</div>
+
+    <div class="form-row">
+      <div class="form-group" style="margin-bottom:0">
+        <label>מ-חודש</label>
+        <select id="fromMonth">
+          <option value="1">ינואר</option><option value="2">פברואר</option>
+          <option value="3">מרץ</option><option value="4">אפריל</option>
+          <option value="5">מאי</option><option value="6">יוני</option>
+          <option value="7">יולי</option><option value="8">אוגוסט</option>
+          <option value="9">ספטמבר</option><option value="10">אוקטובר</option>
+          <option value="11">נובמבר</option><option value="12">דצמבר</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label>עד-חודש</label>
+        <select id="toMonth">
+          <option value="1">ינואר</option><option value="2">פברואר</option>
+          <option value="3">מרץ</option><option value="4">אפריל</option>
+          <option value="5">מאי</option><option value="6">יוני</option>
+          <option value="7">יולי</option><option value="8">אוגוסט</option>
+          <option value="9">ספטמבר</option><option value="10">אוקטובר</option>
+          <option value="11">נובמבר</option><option value="12">דצמבר</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group" style="margin-bottom:0">
+        <label>שנה</label>
+        <select id="year">
+          <option value="2025">2025</option>
+          <option value="2024">2024</option>
+          <option value="2023">2023</option>
+          <option value="2026">2026</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label>שם תיקייה ב-Drive</label>
+        <input type="text" id="folderName" value="חשבוניות" style="direction:rtl; text-align:right;" />
+      </div>
+    </div>
+
+    <!-- Keywords -->
+    <div class="keywords-section" style="margin-top:16px;">
+      <label>מילות חיפוש (לחץ להפעלה/ביטול)</label>
+      <div class="pills-container" id="keywordPills"></div>
+    </div>
+
+    <!-- Options -->
+    <div style="margin-top:16px;">
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">חיפוש בנושא המייל</div>
+          <div class="toggle-sublabel">מחפש גם בשורת הנושא</div>
+        </div>
+        <label class="toggle"><input type="checkbox" id="searchSubject" checked><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">חיפוש בגוף המייל</div>
+          <div class="toggle-sublabel">מחפש גם בתוכן הודעה (איטי יותר)</div>
+        </div>
+        <label class="toggle"><input type="checkbox" id="searchBody"><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">שמור קבצים מצורפים בלבד</div>
+          <div class="toggle-sublabel">PDF ו-DOCX בלבד לדרייב</div>
+        </div>
+        <label class="toggle"><input type="checkbox" id="attachmentsOnly" checked><span class="slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">שמור גם את המייל עצמו כ-PDF</div>
+          <div class="toggle-sublabel">גם כשאין קבצים מצורפים</div>
+        </div>
+        <label class="toggle"><input type="checkbox" id="saveEmail"><span class="slider"></span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Run Button -->
+  <button class="btn btn-primary" id="runBtn" onclick="runCollection()" disabled>
+    🚀 &nbsp; הפעל איסוף חשבוניות
+  </button>
+
+  <!-- Progress -->
+  <div class="progress-section" id="progressSection">
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">⚡ מתקדם...</div>
+      <div class="progress-bar-outer">
+        <div class="progress-bar-inner" id="progressBar" style="width:0%"></div>
+      </div>
+      <div class="progress-text" id="progressText">מתחיל...</div>
+      <div class="log-container" id="logContainer"></div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="resultsSection" style="display:none;">
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">✅ סיום! תוצאות</div>
+      <div class="results-grid">
+        <div class="stat-box">
+          <div class="stat-num" id="statFound">0</div>
+          <div class="stat-label">מיילים נמצאו</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statSaved" style="color:var(--green)">0</div>
+          <div class="stat-label">קבצים נשמרו</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statFailed" style="color:var(--red)">0</div>
+          <div class="stat-label">שגיאות</div>
+        </div>
+      </div>
+      <a class="folder-link" id="driveFolderLink" href="#" target="_blank">
+        📁 &nbsp; פתח תיקייה ב-Google Drive
+      </a>
+      <div class="email-list" id="emailList"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────
+let accessToken = null;
+let driveFolderId = null;
+let driveFolderUrl = '#';
+
+const KEYWORDS = {
+  en: ["invoice", "receipt", "bill", "payment confirmation", "order confirmation", "tax invoice", "pro forma", "statement"],
+  he: ["חשבונית", "קבלה", "חשבון", "אישור תשלום", "אישור הזמנה", "חשבונית מס", "חשבונית עסקה", "דרישת תשלום"]
+};
+
+let activeKeywords = new Set([...KEYWORDS.en, ...KEYWORDS.he]);
+
+// ─── Init ─────────────────────────────────────────────────────────────
+window.onload = () => {
+  // Set current month range
+  const now = new Date();
+  document.getElementById('fromMonth').value = now.getMonth() + 1;
+  document.getElementById('toMonth').value = now.getMonth() + 1;
+  document.getElementById('year').value = now.getFullYear();
+
+  // Build keyword pills
+  buildPills();
+
+  // Check for saved client ID
+  const saved = localStorage.getItem('gClientId');
+  if (saved) document.getElementById('clientIdInput').value = saved;
+};
+
+function buildPills() {
+  const container = document.getElementById('keywordPills');
+  container.innerHTML = '';
+  [...KEYWORDS.en, ...KEYWORDS.he].forEach(kw => {
+    const pill = document.createElement('div');
+    const isHe = KEYWORDS.he.includes(kw);
+    pill.className = 'pill active';
+    pill.innerHTML = `<span class="lang-tag">${isHe ? 'עב' : 'EN'}</span>${kw}`;
+    pill.onclick = () => {
+      if (activeKeywords.has(kw)) {
+        activeKeywords.delete(kw);
+        pill.classList.remove('active');
+      } else {
+        activeKeywords.add(kw);
+        pill.classList.add('active');
+      }
+    };
+    container.appendChild(pill);
+  });
+}
+
+// ─── Auth ─────────────────────────────────────────────────────────────
+function handleAuth() {
+  const clientId = document.getElementById('clientIdInput').value.trim();
+  if (!clientId) { alert('יש להכניס Client ID תחילה'); return; }
+  localStorage.setItem('gClientId', clientId);
+
+  const scopes = [
+    'https://www.googleapis.com/auth/gmail.readonly',
+    'https://www.googleapis.com/auth/drive.file'
+  ].join(' ');
+
+  const params = new URLSearchParams({
+    client_id: clientId,
+    redirect_uri: window.location.href.split('?')[0],
+    response_type: 'token',
+    scope: scopes,
+    include_granted_scopes: 'true'
+  });
+
+  window.location.href = `https://accounts.google.com/o/oauth2/auth?${params}`;
+}
+
+// Handle OAuth redirect
+function parseHash() {
+  const hash = window.location.hash.substring(1);
+  if (!hash) return;
+  const params = new URLSearchParams(hash);
+  const token = params.get('access_token');
+  if (token) {
+    accessToken = token;
+    window.location.hash = '';
+    updateAuthStatus(true);
+    document.getElementById('runBtn').disabled = false;
+    log('✓ Connected to Google successfully', 'success');
+  }
+}
+parseHash();
+
+function updateAuthStatus(connected) {
+  const el = document.getElementById('authStatus');
+  if (connected) {
+    el.className = 'auth-status connected';
+    el.innerHTML = '<div class="dot pulse"></div><span>מחובר ל-Google — מוכן לפעולה ✓</span>';
+  } else {
+    el.className = 'auth-status disconnected';
+    el.innerHTML = '<div class="dot"></div><span>לא מחובר — הכנס Client ID והתחבר</span>';
+  }
+}
+
+// ─── Logging ──────────────────────────────────────────────────────────
+function log(msg, type = 'info') {
+  const container = document.getElementById('logContainer');
+  const line = document.createElement('div');
+  line.className = `log-line ${type}`;
+  const time = new Date().toLocaleTimeString('he-IL');
+  line.textContent = `[${time}] ${msg}`;
+  container.appendChild(line);
+  container.scrollTop = container.scrollHeight;
+}
+
+function setProgress(pct, text) {
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressText').textContent = text;
+}
+
+// ─── Gmail API ───────────────────────────────────────────────────────
+async function gmailFetch(path, params = {}) {
+  const url = new URL(`https://gmail.googleapis.com/gmail/v1/users/me/${path}`);
+  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+  if (!res.ok) throw new Error(`Gmail API error: ${res.status}`);
+  return res.json();
+}
+
+async function driveFetch(method, path, body, isUpload = false) {
+  const base = isUpload ? 'https://www.googleapis.com/upload/drive/v3' : 'https://www.googleapis.com/drive/v3';
+  const url = new URL(`${base}/${path}`);
+  if (isUpload) url.searchParams.set('uploadType', 'multipart');
+
+  const opts = {
+    method,
+    headers: { Authorization: `Bearer ${accessToken}` },
+  };
+
+  if (body && !isUpload) {
+    opts.headers['Content-Type'] = 'application/json';
+    opts.body = JSON.stringify(body);
+  } else if (body) {
+    opts.body = body;
+  }
+
+  const res = await fetch(url, opts);
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Drive API error ${res.status}: ${err}`);
+  }
+  return res.json();
+}
+
+// ─── Drive Helpers ────────────────────────────────────────────────────
+async function getOrCreateFolder(name) {
+  // Check if folder exists
+  const search = await driveFetch('GET', `files?q=${encodeURIComponent(`name='${name}' and mimeType='application/vnd.google-apps.folder' and trashed=false`)}&fields=files(id,webViewLink)`);
+  if (search.files && search.files.length > 0) {
+    log(`📁 תיקייה קיימת: "${name}"`, 'info');
+    return { id: search.files[0].id, url: search.files[0].webViewLink };
+  }
+
+  const folder = await driveFetch('POST', 'files', {
+    name,
+    mimeType: 'application/vnd.google-apps.folder'
+  });
+  log(`📁 תיקייה נוצרה: "${name}"`, 'success');
+  return { id: folder.id, url: `https://drive.google.com/drive/folders/${folder.id}` };
+}
+
+async function uploadToDrive(folderId, filename, mimeType, data) {
+  const metadata = { name: filename, parents: [folderId] };
+
+  const form = new FormData();
+  form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+  form.append('file', new Blob([data], { type: mimeType }));
+
+  const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: form
+  });
+
+  if (!res.ok) throw new Error(`Upload failed: ${res.status}`);
+  return res.json();
+}
+
+// ─── Build Gmail Query ────────────────────────────────────────────────
+function buildGmailQuery(year, fromMonth, toMonth) {
+  const keywords = [...activeKeywords];
+  const searchSubject = document.getElementById('searchSubject').checked;
+  const searchBody = document.getElementById('searchBody').checked;
+
+  // Date range
+  const pad = n => String(n).padStart(2, '0');
+  const afterDate = `${year}/${pad(fromMonth)}/01`;
+  // Last day of toMonth
+  const lastDay = new Date(year, toMonth, 0).getDate();
+  const beforeDate = `${year}/${pad(toMonth)}/${lastDay}`;
+
+  let query = `after:${afterDate} before:${beforeDate}`;
+
+  if (document.getElementById('attachmentsOnly').checked) {
+    query += ' has:attachment';
+  }
+
+  // Build keyword OR
+  const parts = keywords.map(kw => {
+    const encoded = kw.includes(' ') ? `"${kw}"` : kw;
+    const subjectPart = searchSubject ? `subject:${encoded}` : '';
+    const bodyPart = searchBody ? encoded : '';
+    if (subjectPart && bodyPart) return `(${subjectPart} OR ${bodyPart})`;
+    return subjectPart || bodyPart;
+  }).filter(Boolean);
+
+  if (parts.length > 0) {
+    query += ` (${parts.join(' OR ')})`;
+  }
+
+  return query;
+}
+
+// ─── Main Collection Logic ────────────────────────────────────────────
+async function runCollection() {
+  if (!accessToken) { alert('יש להתחבר ל-Google תחילה'); return; }
+
+  document.getElementById('progressSection').classList.add('visible');
+  document.getElementById('resultsSection').style.display = 'none';
+  document.getElementById('logContainer').innerHTML = '';
+  document.getElementById('runBtn').disabled = true;
+
+  const year = parseInt(document.getElementById('year').value);
+  const fromMonth = parseInt(document.getElementById('fromMonth').value);
+  const toMonth = parseInt(document.getElementById('toMonth').value);
+  const folderName = document.getElementById('folderName').value || 'חשבוניות';
+  const saveEmail = document.getElementById('saveEmail').checked;
+  const attachmentsOnly = document.getElementById('attachmentsOnly').checked;
+
+  let found = 0, saved = 0, failed = 0;
+  const emailItems = [];
+
+  try {
+    // 1. Create/get Drive folder
+    setProgress(5, 'מחפש / יוצר תיקייה ב-Google Drive...');
+    log('🔄 מתחבר ל-Google Drive...', 'info');
+    const { id: folderId, url: folderUrl } = await getOrCreateFolder(folderName);
+    driveFolderId = folderId;
+    driveFolderUrl = folderUrl;
+    document.getElementById('driveFolderLink').href = folderUrl;
+
+    // 2. Build & run Gmail search
+    setProgress(10, 'מחפש מיילים ב-Gmail...');
+    const query = buildGmailQuery(year, fromMonth, toMonth);
+    log(`🔍 שאילתה: ${query}`, 'info');
+
+    let messageIds = [];
+    let pageToken = null;
+
+    do {
+      const params = { q: query, maxResults: 100, fields: 'messages(id,threadId),nextPageToken' };
+      if (pageToken) params.pageToken = pageToken;
+      const result = await gmailFetch('messages', params);
+      if (result.messages) messageIds.push(...result.messages);
+      pageToken = result.nextPageToken;
+    } while (pageToken);
+
+    found = messageIds.length;
+    log(`📬 נמצאו ${found} מיילים`, found > 0 ? 'success' : 'warning');
+    setProgress(20, `נמצאו ${found} מיילים — מעבד...`);
+
+    if (found === 0) {
+      log('לא נמצאו מיילים עם מילות המפתח שנבחרו בטווח התאריכים', 'warning');
+      showResults(found, saved, failed, emailItems);
+      return;
+    }
+
+    // 3. Process each email
+    for (let i = 0; i < messageIds.length; i++) {
+      const { id } = messageIds[i];
+      const pct = 20 + Math.round((i / messageIds.length) * 75);
+      setProgress(pct, `מעבד ${i + 1} מתוך ${found}...`);
+
+      try {
+        const msg = await gmailFetch(`messages/${id}`, { format: 'full' });
+        const headers = msg.payload?.headers || [];
+        const subject = headers.find(h => h.name === 'Subject')?.value || '(ללא נושא)';
+        const from = headers.find(h => h.name === 'From')?.value || '';
+        const date = headers.find(h => h.name === 'Date')?.value || '';
+        const dateStr = date ? new Date(date).toLocaleDateString('he-IL') : '';
+
+        log(`📧 [${i+1}/${found}] ${subject.substring(0, 50)}`, 'info');
+
+        let emailSaved = false;
+
+        // Process attachments
+        const attachments = getAttachments(msg.payload);
+
+        for (const att of attachments) {
+          try {
+            const attData = await gmailFetch(`messages/${id}/attachments/${att.attachmentId}`);
+            const bytes = base64ToArrayBuffer(attData.data);
+            const safeName = sanitizeFilename(`${dateStr}_${subject}_${att.filename}`);
+            await uploadToDrive(folderId, safeName, att.mimeType, bytes);
+            log(`  ✓ שמור: ${att.filename}`, 'success');
+            saved++;
+            emailSaved = true;
+          } catch (e) {
+            log(`  ✗ שגיאה בקובץ: ${att.filename} — ${e.message}`, 'error');
+            failed++;
+          }
+        }
+
+        // Save email as EML if no attachments and saveEmail is on
+        if (saveEmail && !emailSaved) {
+          try {
+            const rawMsg = await gmailFetch(`messages/${id}`, { format: 'raw' });
+            const rawBytes = base64ToArrayBuffer(rawMsg.raw);
+            const safeName = sanitizeFilename(`${dateStr}_${subject}.eml`);
+            await uploadToDrive(folderId, safeName, 'message/rfc822', rawBytes);
+            log(`  ✓ מייל נשמר: ${safeName.substring(0, 40)}`, 'success');
+            saved++;
+            emailSaved = true;
+          } catch (e) {
+            log(`  ✗ שגיאה בשמירת מייל: ${e.message}`, 'error');
+            failed++;
+          }
+        }
+
+        emailItems.push({
+          subject,
+          from: from.replace(/<.*>/, '').trim(),
+          status: emailSaved ? 'saved' : (attachmentsOnly && attachments.length === 0 ? 'pending' : 'pending'),
+          attachCount: attachments.length
+        });
+
+      } catch (e) {
+        log(`✗ שגיאה בעיבוד מייל: ${e.message}`, 'error');
+        failed++;
+      }
+
+      // Small delay to avoid rate limiting
+      if (i % 10 === 9) await sleep(500);
+    }
+
+    setProgress(100, 'הושלם!');
+    log(`🎉 סיום! נשמרו ${saved} קבצים`, 'success');
+
+  } catch (e) {
+    log(`❌ שגיאה קריטית: ${e.message}`, 'error');
+    console.error(e);
+  }
+
+  showResults(found, saved, failed, emailItems);
+  document.getElementById('runBtn').disabled = false;
+}
+
+function getAttachments(payload) {
+  const result = [];
+  if (!payload) return result;
+
+  const allowed = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/msword', 'image/jpeg', 'image/png', 'application/octet-stream'];
+
+  function walk(part) {
+    if (!part) return;
+    if (part.filename && part.body?.attachmentId) {
+      const mt = part.mimeType || 'application/octet-stream';
+      result.push({ filename: part.filename, attachmentId: part.body.attachmentId, mimeType: mt });
+    }
+    if (part.parts) part.parts.forEach(walk);
+  }
+
+  walk(payload);
+  return result;
+}
+
+function base64ToArrayBuffer(base64) {
+  const b64 = base64.replace(/-/g, '+').replace(/_/g, '/');
+  const raw = atob(b64);
+  const buffer = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i++) buffer[i] = raw.charCodeAt(i);
+  return buffer;
+}
+
+function sanitizeFilename(name) {
+  return name.replace(/[/\\?%*:|"<>]/g, '-').substring(0, 200);
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function showResults(found, saved, failed, items) {
+  document.getElementById('statFound').textContent = found;
+  document.getElementById('statSaved').textContent = saved;
+  document.getElementById('statFailed').textContent = failed;
+  document.getElementById('driveFolderLink').href = driveFolderUrl;
+
+  const list = document.getElementById('emailList');
+  list.innerHTML = '';
+  items.slice(0, 50).forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'email-item';
+    const statusLabel = item.status === 'saved' ? 'נשמר' : 'לא נשמר';
+    div.innerHTML = `
+      <div class="icon">${item.attachCount > 0 ? '📎' : '📧'}</div>
+      <div class="email-meta">
+        <div class="email-subject">${item.subject}</div>
+        <div class="email-from">${item.from}${item.attachCount > 0 ? ` · ${item.attachCount} קבצים` : ''}</div>
+      </div>
+      <div class="badge ${item.status}">${statusLabel}</div>
+    `;
+    list.appendChild(div);
+  });
+
+  document.getElementById('resultsSection').style.display = 'block';
+  document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
